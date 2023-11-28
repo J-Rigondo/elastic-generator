@@ -1,35 +1,24 @@
-const csvReader = require('./libs/csv-reader');
-const {Client} = require('@elastic/elasticsearch');
+const csvReadBulkInsert = require("./libs/csv-reader");
+const { Client } = require("@elastic/elasticsearch");
+const { bulkInsert } = require("./utils");
+const { adList } = require("./data");
 
 async function main() {
-    const client = new Client({
-        node: 'http://localhost:9200',
-    });
+  const client = new Client({
+    node: "http://localhost:9200",
+  });
 
-    client.diagnostic.on('response',
-        (err, result) => {
-        if (err) {
-            console.error(err)
-        } else {
-            console.info(result)
-        }
-    })
-
-    const records = csvReader();
-
-    try {
-        await client.index({
-            index: 'my-keyword',
-            document: {
-                "keyword": "펩시콜라",
-
-            },
-        })
-    } catch (e) {
-        console.error(e);
+  client.diagnostic.on("response", (err, result) => {
+    if (err) {
+      console.error(err);
+    } else {
+      console.info(result);
     }
+  });
 
+  csvReadBulkInsert(client);
 
+  // await bulkInsert({client, indexName:'ad-index',dataset:adList});
 }
 
 main();
